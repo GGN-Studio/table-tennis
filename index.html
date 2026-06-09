@@ -60,7 +60,7 @@
     position:absolute;
     left:50%;
     top:50%;
-    width:1320px;
+    width:1500px;
     height:930px;
     transform-origin:center center;
     background:#fff;
@@ -69,7 +69,7 @@
   #wires{
     position:absolute;
     inset:0;
-    width:1320px;
+    width:1500px;
     height:930px;
     pointer-events:none;
   }
@@ -186,9 +186,8 @@
   }
 
   .seed .txt{
-    white-space:pre;
     font-size:18px;
-    line-height:1.4;
+    line-height:1;
     color:#11161c;
   }
 
@@ -217,16 +216,15 @@
   .box.won.lost .team-input{ color:var(--lost) !important; }
 
   .champ .txt{
-    font-size:22px;
+    font-size:18px;
     font-weight:700;
     color:var(--green);
   }
 
   .final .txt{
-    font-size:35px;
+    font-size:18px;
     font-weight:700;
     line-height:1;
-    transform:translateY(3px);
     color:var(--green);
   }
 
@@ -294,7 +292,7 @@
 
   .legend{
     position:absolute;
-    left:372px;
+    left:462px;
     top:735px;
     z-index:3;
     width:575px;
@@ -346,7 +344,7 @@
   <button id="resetBtn" type="button">초기화</button>
   <div id="stage">
     <div id="canvas">
-      <svg id="wires" viewBox="0 0 1320 930"></svg>
+      <svg id="wires" viewBox="0 0 1500 930"></svg>
       <div class="title-wrap">
         <div class="title">18강 토너먼트 구조</div>
         <div class="subtitle">A조 9팀 / B조 9팀 → 각 조 우승팀 결승</div>
@@ -366,25 +364,25 @@
 
 <script>
 (function(){
-  var W = 1320, H = 930;
+  var W = 1500, H = 930;
   var stage = document.getElementById("stage");
   var canvas = document.getElementById("canvas");
   var teamY = [205, 265, 325, 385, 445, 505, 565, 625, 685];
 
   var COL = {
     team:{x:22, w:165},
-    win:{x:200, w:165},
-    seed:{x:375, w:122},
-    champ:{x:455, w:128},
-    champR:{x:735, w:128},
-    final:{x:612, w:96}
+    win:{x:220, w:165},
+    seed:{x:420, w:165},
+    champ:{x:473, w:165},
+    champR:{x:862, w:165},
+    final:{x:668, w:165}
   };
 
   var Hteam = 45;
   var Hwin = 45;
-  var Hseed = 74;
-  var Hchamp = 77;
-  var Hfinal = 77;
+  var Hseed = 45;
+  var Hchamp = 45;
+  var Hfinal = 45;
 
   function avg(a,b){ return (a+b)/2; }
   function mx(x,w){ return W - x - w; }
@@ -412,8 +410,8 @@
   var seedY2 = avg(winnerY[2],winnerY[4]);
   var champY = avg(seedY1,seedY2);
 
-  add({id:"sL1", x:COL.seed.x, y:seedY1, w:COL.seed.w, h:Hseed, cls:"seed", label:"A조 결승\n진출팀 1"});
-  add({id:"sL2", x:COL.seed.x, y:seedY2, w:COL.seed.w, h:Hseed, cls:"seed", label:"A조 결승\n진출팀 2"});
+  add({id:"sL1", x:COL.seed.x, y:seedY1, w:COL.seed.w, h:Hseed, cls:"seed", label:"A조 결승진출 1"});
+  add({id:"sL2", x:COL.seed.x, y:seedY2, w:COL.seed.w, h:Hseed, cls:"seed", label:"A조 결승진출 2"});
   add({id:"cL", x:COL.champ.x, y:champY, w:COL.champ.w, h:Hchamp, cls:"champ", label:"A조 우승"});
   add({id:"F", x:COL.final.x, y:champY, w:COL.final.w, h:Hfinal, cls:"final", label:"결승"});
 
@@ -425,8 +423,8 @@
     add({id:"wR"+(i+1), x:mx(COL.win.x,COL.win.w), y:winnerY[i], w:COL.win.w, h:Hwin, cls:"winner", label:"winner B"+(i+1)});
   }
 
-  add({id:"sR1", x:mx(COL.seed.x,COL.seed.w), y:seedY1, w:COL.seed.w, h:Hseed, cls:"seed", label:"B조 결승\n진출팀 1"});
-  add({id:"sR2", x:mx(COL.seed.x,COL.seed.w), y:seedY2, w:COL.seed.w, h:Hseed, cls:"seed", label:"B조 결승\n진출팀 2"});
+  add({id:"sR1", x:mx(COL.seed.x,COL.seed.w), y:seedY1, w:COL.seed.w, h:Hseed, cls:"seed", label:"B조 결승진출 1"});
+  add({id:"sR2", x:mx(COL.seed.x,COL.seed.w), y:seedY2, w:COL.seed.w, h:Hseed, cls:"seed", label:"B조 결승진출 2"});
   add({id:"cR", x:COL.champR.x, y:champY, w:COL.champR.w, h:Hchamp, cls:"champ", label:"B조 우승"});
 
   function getBox(id){
@@ -446,9 +444,9 @@
     };
   }
 
-  var c0 = 193;
-  var c1 = 370;
-  var c2 = 522;
+  var c0 = 204;
+  var c1 = 403;
+  var c2 = 600;
   var matches = [
     {kids:["tL1","tL2"], pid:"wL1", busX:c0, side:"L", type:"pair"},
     {kids:["tL3","tL4"], pid:"wL2", busX:c0, side:"L", type:"pair"},
