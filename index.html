@@ -192,6 +192,30 @@
     color:#11161c;
   }
 
+  .team-input{
+    width:100%;
+    border:none;
+    outline:none;
+    background:transparent;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:500;
+    color:#05080b;
+    text-align:center;
+    padding:0 4px;
+    cursor:text;
+    min-width:0;
+  }
+
+  .team-input::placeholder{
+    color:#b8bec4;
+    font-size:12px;
+  }
+
+  .box.won .team-input{ color:var(--green-dark) !important; }
+  .box.lost .team-input{ color:var(--lost) !important; }
+  .box.won.lost .team-input{ color:var(--lost) !important; }
+
   .champ .txt{
     font-size:22px;
     font-weight:700;
@@ -547,55 +571,83 @@
     box.style.width = b.w + "px";
     box.style.height = b.h + "px";
 
-    var txt = document.createElement("div");
-    txt.className = "txt";
-    txt.spellcheck = false;
-    txt.contentEditable = "false";
-    box.appendChild(txt);
+    if(b.cls === "team"){
+      var inp = document.createElement("input");
+      inp.type = "text";
+      inp.className = "team-input";
+      inp.placeholder = b.label;
+      inp.value = store[b.id] || "";
+      inp.spellcheck = false;
+      inp.maxLength = 24;
+      box.appendChild(inp);
+      box._inp = inp;
+      txtEl[b.id] = null;
+
+      inp.addEventListener("click", function(e){ e.stopPropagation(); });
+
+      inp.addEventListener("change", function(){
+        var value = inp.value.trim();
+        if(!value) delete store[b.id];
+        else store[b.id] = value;
+        save();
+        recompute(false);
+      });
+
+      inp.addEventListener("keydown", function(e){
+        if(e.key === "Enter"){ e.preventDefault(); inp.blur(); }
+      });
+
+      box.addEventListener("click", function(){ toggleWin(b.id); });
+    } else {
+      var txt = document.createElement("div");
+      txt.className = "txt";
+      txt.spellcheck = false;
+      txt.contentEditable = "false";
+      box.appendChild(txt);
+      txtEl[b.id] = txt;
+
+      var clickTimer = null;
+      box.addEventListener("click",function(){
+        if(editingId === b.id) return;
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(function(){ toggleWin(b.id); }, 220);
+      });
+
+      box.addEventListener("dblclick",function(){
+        clearTimeout(clickTimer);
+        editingId = b.id;
+        txt.contentEditable = "true";
+        box.classList.add("editing");
+        txt.focus();
+
+        var range = document.createRange();
+        range.selectNodeContents(txt);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      });
+
+      txt.addEventListener("blur",function(){
+        if(editingId !== b.id) return;
+        var value = txt.textContent.replace(/\s+$/,"");
+        if(value === defLabel[b.id]) delete store[b.id];
+        else store[b.id] = value;
+        editingId = null;
+        txt.contentEditable = "false";
+        box.classList.remove("editing");
+        save();
+        recompute(false);
+      });
+
+      txt.addEventListener("keydown",function(e){
+        if(e.key === "Enter"){
+          e.preventDefault();
+          txt.blur();
+        }
+      });
+    }
 
     boxEl[b.id] = box;
-    txtEl[b.id] = txt;
-
-    var clickTimer = null;
-    box.addEventListener("click",function(){
-      if(editingId === b.id) return;
-      clearTimeout(clickTimer);
-      clickTimer = setTimeout(function(){ toggleWin(b.id); }, 220);
-    });
-
-    box.addEventListener("dblclick",function(){
-      clearTimeout(clickTimer);
-      editingId = b.id;
-      txt.contentEditable = "true";
-      box.classList.add("editing");
-      txt.focus();
-
-      var range = document.createRange();
-      range.selectNodeContents(txt);
-      var sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    });
-
-    txt.addEventListener("blur",function(){
-      if(editingId !== b.id) return;
-      var value = txt.textContent.replace(/\s+$/,"");
-      if(value === defLabel[b.id]) delete store[b.id];
-      else store[b.id] = value;
-      editingId = null;
-      txt.contentEditable = "false";
-      box.classList.remove("editing");
-      save();
-      recompute(false);
-    });
-
-    txt.addEventListener("keydown",function(e){
-      if(e.key === "Enter"){
-        e.preventDefault();
-        txt.blur();
-      }
-    });
-
     canvas.appendChild(box);
   });
 
@@ -855,7 +907,12 @@
     var shouldRevealFinal = animate && !!winSel.F && txtEl.F.textContent !== finalText;
 
     boxes.forEach(function(b){
-      if(editingId !== b.id) txtEl[b.id].textContent = displayText(b.id);
+      if(b.cls === "team"){
+        if(document.activeElement !== boxEl[b.id]._inp)
+          boxEl[b.id]._inp.value = store[b.id] || "";
+      } else {
+        if(editingId !== b.id) txtEl[b.id].textContent = displayText(b.id);
+      }
       boxEl[b.id].classList.toggle("won", !!wonSet[b.id]);
       boxEl[b.id].classList.toggle("lost", !!lostSet[b.id]);
     });
