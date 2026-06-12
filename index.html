@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>길가는 교회 탁구 18강 토너먼트</title>
+<title>길가는 교회 탁구 16강 토너먼트</title>
 <style>
   :root{
     --green:#168336;
@@ -293,17 +293,17 @@
   .legend{
     position:absolute;
     left:462px;
-    top:735px;
+    top:820px;
     z-index:3;
     width:575px;
-    padding:16px 32px 15px 56px;
+    padding:13px 32px 12px 52px;
     border:3px solid var(--green-dark);
     border-radius:14px;
     background:#fff;
   }
 
   .legend li{
-    font-size:23px;
+    font-size:21px;
     line-height:1.55;
     color:#05080b;
     white-space:nowrap;
@@ -317,7 +317,7 @@
   #resetBtn{
     position:fixed;
     right:18px;
-    bottom:18px;
+    bottom:24px;
     z-index:30;
     min-width:86px;
     height:40px;
@@ -346,16 +346,15 @@
     <div id="canvas">
       <svg id="wires" viewBox="0 0 1500 930"></svg>
       <div class="title-wrap">
-        <div class="title">18강 토너먼트 구조</div>
-        <div class="subtitle">A조 9팀 / B조 9팀 → 각 조 우승팀 결승</div>
+        <div class="title">16강 토너먼트 구조</div>
+        <div class="subtitle">A조 8팀 / B조 8팀 → 각 조 우승팀 결승</div>
       </div>
-      <div class="group-pill" style="left:55px; top:126px;">A조</div>
-      <div class="group-pill" style="right:55px; top:126px;">B조</div>
+      <div class="group-pill" style="left:25px; top:126px;">A조</div>
+      <div class="group-pill" style="right:25px; top:126px;">B조</div>
       <div class="legend">
         <ul>
-          <li>각 조 9팀으로 진행</li>
-          <li>7번 · 8번 승자와 9번이 한 번 더 경기</li>
-          <li>7번 · 8번 · 9번은 2승 후 조 4강 진출</li>
+          <li>각 조 8팀으로 진행 (A조 / B조)</li>
+          <li>16강 → 8강 → 4강 → 각 조 우승</li>
           <li>각 조 우승팀이 결승 진출</li>
         </ul>
       </div>
@@ -367,22 +366,19 @@
   var W = 1500, H = 930;
   var stage = document.getElementById("stage");
   var canvas = document.getElementById("canvas");
-  var teamY = [205, 265, 325, 385, 445, 505, 565, 625, 685];
+
+  // A조·B조 각 8팀, 78px 간격 (220부터 시작 → 조 라벨과 간격 확보)
+  var teamY = [220, 298, 376, 454, 532, 610, 688, 766];
 
   var COL = {
-    team:{x:22, w:165},
-    win:{x:220, w:165},
-    seed:{x:420, w:165},
-    champ:{x:473, w:165},
-    champR:{x:862, w:165},
-    final:{x:668, w:165}
+    team:  {x:20,  w:150},
+    r1win: {x:215, w:150},
+    semi:  {x:415, w:150},
+    champ: {x:510, w:150},
+    final: {x:695, w:110}
   };
 
-  var Hteam = 45;
-  var Hwin = 45;
-  var Hseed = 45;
-  var Hchamp = 45;
-  var Hfinal = 45;
+  var Hbox = 45;
 
   function avg(a,b){ return (a+b)/2; }
   function mx(x,w){ return W - x - w; }
@@ -390,81 +386,61 @@
   var boxes = [];
   function add(o){ boxes.push(o); return o; }
 
-  for(var i=0;i<9;i++){
-    add({id:"tL"+(i+1), x:COL.team.x, y:teamY[i], w:COL.team.w, h:Hteam, cls:"team", label:(i+1)+"번"});
+  // ── 왼쪽 (A조) ──
+  for(var i=0;i<8;i++){
+    add({id:"tL"+(i+1), x:COL.team.x,  y:teamY[i], w:COL.team.w,  h:Hbox, cls:"team",   label:(i+1)+"조"});
   }
 
-  var winnerY = [
+  var r1Y = [
     avg(teamY[0],teamY[1]),
     avg(teamY[2],teamY[3]),
     avg(teamY[4],teamY[5]),
-    avg(teamY[6],teamY[7]),
-    teamY[8]
+    avg(teamY[6],teamY[7])
   ];
-
-  for(i=0;i<5;i++){
-    add({id:"wL"+(i+1), x:COL.win.x, y:winnerY[i], w:COL.win.w, h:Hwin, cls:"winner", label:"winner A"+(i+1)});
+  for(i=0;i<4;i++){
+    add({id:"wL"+(i+1), x:COL.r1win.x, y:r1Y[i],   w:COL.r1win.w, h:Hbox, cls:"winner", label:"A조 8강 "+(i+1)});
   }
 
-  var seedY1 = avg(winnerY[0],winnerY[1]);
-  var seedY2 = avg(winnerY[2],winnerY[4]);
-  var champY = avg(seedY1,seedY2);
+  var sY = [avg(r1Y[0],r1Y[1]), avg(r1Y[2],r1Y[3])];
+  add({id:"sL1", x:COL.semi.x,  y:sY[0], w:COL.semi.w,  h:Hbox, cls:"seed",  label:"A조 4강 1"});
+  add({id:"sL2", x:COL.semi.x,  y:sY[1], w:COL.semi.w,  h:Hbox, cls:"seed",  label:"A조 4강 2"});
 
-  add({id:"sL1", x:COL.seed.x, y:seedY1, w:COL.seed.w, h:Hseed, cls:"seed", label:"A조 결승진출 1"});
-  add({id:"sL2", x:COL.seed.x, y:seedY2, w:COL.seed.w, h:Hseed, cls:"seed", label:"A조 결승진출 2"});
-  add({id:"cL", x:COL.champ.x, y:champY, w:COL.champ.w, h:Hchamp, cls:"champ", label:"A조 우승"});
-  add({id:"F", x:COL.final.x, y:champY, w:COL.final.w, h:Hfinal, cls:"final", label:"결승"});
+  var champY = avg(sY[0], sY[1]);
+  add({id:"cL", x:COL.champ.x, y:champY, w:COL.champ.w, h:Hbox, cls:"champ", label:"A조 우승"});
+  add({id:"F",  x:COL.final.x, y:champY, w:COL.final.w, h:Hbox, cls:"final", label:"결승"});
 
-  for(i=0;i<9;i++){
-    add({id:"tR"+(i+1), x:mx(COL.team.x,COL.team.w), y:teamY[i], w:COL.team.w, h:Hteam, cls:"team", label:(i+1)+"번"});
+  // ── 오른쪽 (B조) ──
+  for(i=0;i<8;i++){
+    add({id:"tR"+(i+1), x:mx(COL.team.x,COL.team.w),   y:teamY[i], w:COL.team.w,  h:Hbox, cls:"team",   label:(i+1)+"조"});
   }
-
-  for(i=0;i<5;i++){
-    add({id:"wR"+(i+1), x:mx(COL.win.x,COL.win.w), y:winnerY[i], w:COL.win.w, h:Hwin, cls:"winner", label:"winner B"+(i+1)});
+  for(i=0;i<4;i++){
+    add({id:"wR"+(i+1), x:mx(COL.r1win.x,COL.r1win.w), y:r1Y[i],   w:COL.r1win.w, h:Hbox, cls:"winner", label:"B조 8강 "+(i+1)});
   }
+  add({id:"sR1", x:mx(COL.semi.x,COL.semi.w),   y:sY[0],  w:COL.semi.w,  h:Hbox, cls:"seed",  label:"B조 4강 1"});
+  add({id:"sR2", x:mx(COL.semi.x,COL.semi.w),   y:sY[1],  w:COL.semi.w,  h:Hbox, cls:"seed",  label:"B조 4강 2"});
+  add({id:"cR",  x:mx(COL.champ.x,COL.champ.w), y:champY, w:COL.champ.w, h:Hbox, cls:"champ", label:"B조 우승"});
 
-  add({id:"sR1", x:mx(COL.seed.x,COL.seed.w), y:seedY1, w:COL.seed.w, h:Hseed, cls:"seed", label:"B조 결승진출 1"});
-  add({id:"sR2", x:mx(COL.seed.x,COL.seed.w), y:seedY2, w:COL.seed.w, h:Hseed, cls:"seed", label:"B조 결승진출 2"});
-  add({id:"cR", x:COL.champR.x, y:champY, w:COL.champR.w, h:Hchamp, cls:"champ", label:"B조 우승"});
+  // 버스 x 좌표 (pair 매치용) — 각 버스 양쪽 수평선 약 22-25px
+  var c0 = 192;   // team.right=170 ↔ r1win.left=215 사이
+  var c1 = 390;   // r1win.right=365 ↔ semi.left=415 사이
+  var c2 = 595;   // semi.right=565 → champ 박스 내부(510-660)
 
-  function getBox(id){
-    for(var i=0;i<boxes.length;i++){
-      if(boxes[i].id===id) return boxes[i];
-    }
-  }
-
-  function edges(b){
-    return {
-      L:b.x,
-      R:b.x+b.w,
-      T:b.y-b.h/2,
-      B:b.y+b.h/2,
-      CX:b.x+b.w/2,
-      CY:b.y
-    };
-  }
-
-  var c0 = 204;
-  var c1 = 403;
-  var c2 = 600;
   var matches = [
-    {kids:["tL1","tL2"], pid:"wL1", busX:c0, side:"L", type:"pair"},
-    {kids:["tL3","tL4"], pid:"wL2", busX:c0, side:"L", type:"pair"},
-    {kids:["tL5","tL6"], pid:"wL3", busX:c0, side:"L", type:"pair"},
-    {kids:["tL7","tL8"], pid:"wL4", busX:c0, side:"L", type:"pair"},
-    {kids:["wL4","tL9"], pid:"wL5", side:"L", type:"bye"},
-    {kids:["wL1","wL2"], pid:"sL1", busX:c1, side:"L", type:"pair"},
-    {kids:["wL3","wL5"], pid:"sL2", busX:c1, side:"L", type:"pair"},
-    {kids:["sL1","sL2"], pid:"cL", busX:c2, side:"L", type:"pair"},
+    {kids:["tL1","tL2"], pid:"wL1", busX:c0,   side:"L", type:"pair"},
+    {kids:["tL3","tL4"], pid:"wL2", busX:c0,   side:"L", type:"pair"},
+    {kids:["tL5","tL6"], pid:"wL3", busX:c0,   side:"L", type:"pair"},
+    {kids:["tL7","tL8"], pid:"wL4", busX:c0,   side:"L", type:"pair"},
+    {kids:["wL1","wL2"], pid:"sL1", busX:c1,   side:"L", type:"pair"},
+    {kids:["wL3","wL4"], pid:"sL2", busX:c1,   side:"L", type:"pair"},
+    {kids:["sL1","sL2"], pid:"cL",  busX:c2,   side:"L", type:"pair"},
     {kids:["tR1","tR2"], pid:"wR1", busX:W-c0, side:"R", type:"pair"},
     {kids:["tR3","tR4"], pid:"wR2", busX:W-c0, side:"R", type:"pair"},
     {kids:["tR5","tR6"], pid:"wR3", busX:W-c0, side:"R", type:"pair"},
     {kids:["tR7","tR8"], pid:"wR4", busX:W-c0, side:"R", type:"pair"},
-    {kids:["wR4","tR9"], pid:"wR5", side:"R", type:"bye"},
     {kids:["wR1","wR2"], pid:"sR1", busX:W-c1, side:"R", type:"pair"},
-    {kids:["wR3","wR5"], pid:"sR2", busX:W-c1, side:"R", type:"pair"},
-    {kids:["sR1","sR2"], pid:"cR", busX:W-c2, side:"R", type:"pair"},
-    {kids:["cL","cR"], pid:"F", type:"final"}
+    {kids:["wR3","wR4"], pid:"sR2", busX:W-c1, side:"R", type:"pair"},
+    {kids:["sR1","sR2"], pid:"cR",  busX:W-c2, side:"R", type:"pair"},
+    {kids:["cL","cR"],   pid:"F",              type:"final"}
   ];
 
   var matchByKid = {};
@@ -483,7 +459,7 @@
     return d;
   }
 
-  function draw(pts, cls){
+  function draw(pts,cls){
     var el = document.createElementNS(NS,"path");
     el.setAttribute("d",dStr(pts));
     if(cls) el.setAttribute("class",cls);
@@ -491,9 +467,22 @@
     return el;
   }
 
+  function edges(b){
+    return {
+      L:b.x, R:b.x+b.w,
+      T:b.y-b.h/2, B:b.y+b.h/2,
+      CX:b.x+b.w/2, CY:b.y
+    };
+  }
+
+  function getBox(id){
+    for(var i=0;i<boxes.length;i++) if(boxes[i].id===id) return boxes[i];
+  }
+
   function kidConn(e,side){ return side==="L" ? e.R : e.L; }
   function parConn(e,side){ return side==="L" ? e.L : e.R; }
 
+  // 정적 선 그리기
   matches.forEach(function(m){
     var P = edges(getBox(m.pid));
     m.linesByKid = {};
@@ -510,13 +499,6 @@
       }
     }
 
-    if(m.type==="bye"){
-      var W4 = edges(getBox(m.kids[0]));
-      var T9 = edges(getBox(m.kids[1]));
-      m.linesByKid[m.kids[1]] = [draw([[kidConn(T9,m.side),T9.CY],[parConn(P,m.side),P.CY]])];
-      m.linesByKid[m.kids[0]] = [draw([[W4.CX,W4.B],[W4.CX,P.T]])];
-    }
-
     if(m.type==="final"){
       var L = edges(getBox(m.kids[0]));
       var R = edges(getBox(m.kids[1]));
@@ -525,6 +507,7 @@
     }
   });
 
+  // 승리 선(초록) — 나중에 경로 덮어씀
   matches.forEach(function(m){
     var el = document.createElementNS(NS,"path");
     el.setAttribute("class","win-wire");
@@ -533,9 +516,8 @@
     m.green = el;
   });
 
-  var canvas = document.getElementById("canvas");
   var store = {};
-  try{ store = JSON.parse(localStorage.getItem("pp_bracket_18") || "{}"); }
+  try{ store = JSON.parse(localStorage.getItem("pp_bracket_16") || "{}"); }
   catch(e){ store = {}; }
 
   var winSel = store.__win || {};
@@ -546,7 +528,7 @@
 
   function save(){
     store.__win = winSel;
-    try{ localStorage.setItem("pp_bracket_18", JSON.stringify(store)); }
+    try{ localStorage.setItem("pp_bracket_16", JSON.stringify(store)); }
     catch(e){}
   }
 
@@ -564,9 +546,9 @@
 
     var box = document.createElement("div");
     box.className = "box " + b.cls;
-    box.style.left = b.x + "px";
-    box.style.top = (b.y - b.h/2) + "px";
-    box.style.width = b.w + "px";
+    box.style.left   = b.x + "px";
+    box.style.top    = (b.y - b.h/2) + "px";
+    box.style.width  = b.w + "px";
     box.style.height = b.h + "px";
 
     if(b.cls === "team"){
@@ -617,7 +599,6 @@
         txt.contentEditable = "true";
         box.classList.add("editing");
         txt.focus();
-
         var range = document.createRange();
         range.selectNodeContents(txt);
         var sel = window.getSelection();
@@ -638,10 +619,7 @@
       });
 
       txt.addEventListener("keydown",function(e){
-        if(e.key === "Enter"){
-          e.preventDefault();
-          txt.blur();
-        }
+        if(e.key === "Enter"){ e.preventDefault(); txt.blur(); }
       });
     }
 
@@ -657,111 +635,28 @@
     }
   }
 
-  function setSecondFinalTeam(seedId, id){
-    delete store[seedId];
-    winSel[seedId] = id;
-    clearNextWins(seedId);
-  }
-
-  function clearSecondFinalTeam(seedId){
-    delete store[seedId];
-    delete winSel[seedId];
-    clearNextWins(seedId);
-  }
-
-  if(store.sL2 && !winSel.sL2 && winSel.wL5 !== "wL4"){
-    delete store.sL2;
-    save();
-  }
-  if(store.sR2 && !winSel.sR2 && winSel.wR5 !== "wR4"){
-    delete store.sR2;
-    save();
-  }
-  if(winSel.wL5 === "wL4"){ winSel.wL5 = "tL9"; save(); }
-  if(winSel.wR5 === "wR4"){ winSel.wR5 = "tR9"; save(); }
-
   function toggleWin(id){
     var m = matchByKid[id];
     if(!m) return;
 
-    if(id === "wL4"){
-      winSel.wL5 = "tL9";
-      delete store.wL5;
-      if(winSel.sL2 === "wL4"){
-        delete winSel.sL2;
-        clearNextWins("sL2");
-      }else{
-        setSecondFinalTeam("sL2","wL4");
-      }
-      save();
-      recompute(true);
-      return;
-    }
-
-    if(id === "wR4"){
-      winSel.wR5 = "tR9";
-      delete store.wR5;
-      if(winSel.sR2 === "wR4"){
-        delete winSel.sR2;
-        clearNextWins("sR2");
-      }else{
-        setSecondFinalTeam("sR2","wR4");
-      }
-      save();
-      recompute(true);
-      return;
-    }
-
-    if(id === "tL9" && m.pid === "wL5"){
-      winSel.wL5 = "tL9";
-      delete store.wL5;
-      if(winSel.sL2 === "wL4") winSel.sL2 = "wL5";
-      if(store.sL2) delete store.sL2;
-      save();
-      recompute(true);
-      return;
-    }
-
-    if(id === "tR9" && m.pid === "wR5"){
-      winSel.wR5 = "tR9";
-      delete store.wR5;
-      if(winSel.sR2 === "wR4") winSel.sR2 = "wR5";
-      if(store.sR2) delete store.sR2;
-      save();
-      recompute(true);
-      return;
-    }
-
     for(var i=0;i<m.kids.length;i++){
       var kid = m.kids[i];
       if(matchByParent[kid] && !winSel[kid]){
-        alert("승리팀을 선택하세요.");
+        alert("승리팀을 먼저 선택하세요.");
         return;
       }
     }
 
     if(matchByParent[id] && !winSel[id]){
-      alert("승리팀을 선택하세요.");
+      alert("승리팀을 먼저 선택하세요.");
       return;
     }
 
-    var selected = false;
     if(winSel[m.pid] === id){
       delete winSel[m.pid];
       clearNextWins(m.pid);
-    }else{
+    } else {
       winSel[m.pid] = id;
-      selected = true;
-    }
-
-    if(id === "wL3" || id === "wL4" || id === "wL5"){
-      if(selected) setSecondFinalTeam("sL2", id);
-      else clearSecondFinalTeam("sL2");
-    }
-
-    if(id === "wR3" || id === "wR4" || id === "wR5"){
-      if(selected) setSecondFinalTeam("sR2", id);
-      else clearSecondFinalTeam("sR2");
     }
 
     save();
@@ -778,11 +673,6 @@
         : dStr([[P.R,P.CY],[K.L,K.CY]]);
     }
 
-    if(m.type === "bye"){
-      if(kid === m.kids[1]) return dStr([[kidConn(K,m.side),K.CY],[parConn(P,m.side),P.CY]]);
-      return dStr([[K.CX,K.B],[K.CX,P.T]]);
-    }
-
     if(m.pid === "cL" || m.pid === "cR"){
       return dStr([[kidConn(K,m.side),K.CY],[m.busX,K.CY],[m.busX,P.CY]]);
     }
@@ -795,18 +685,9 @@
     var wasHidden = el.style.display === "none";
     el.setAttribute("d",d);
     el.style.display = "";
-
     var len = 0;
-    try{ len = el.getTotalLength(); }
-    catch(e){ len = 0; }
-
-    if(!len){
-      el.style.transition = "";
-      el.style.strokeDasharray = "";
-      el.style.strokeDashoffset = "";
-      return;
-    }
-
+    try{ len = el.getTotalLength(); } catch(e){ len = 0; }
+    if(!len){ el.style.transition=""; el.style.strokeDasharray=""; el.style.strokeDashoffset=""; return; }
     el.style.strokeDasharray = len;
     if(animate && (wasHidden || oldD !== d)){
       el.style.transition = "none";
@@ -814,7 +695,7 @@
       el.getBoundingClientRect();
       el.style.transition = "stroke-dashoffset .42s ease";
       el.style.strokeDashoffset = "0";
-    }else{
+    } else {
       el.style.transition = "none";
       el.style.strokeDashoffset = "0";
     }
@@ -832,27 +713,22 @@
   function fireworkFinal(done){
     var old = document.querySelector(".burst");
     if(old) old.remove();
-
     var burst = document.createElement("div");
     burst.className = "burst";
     var colors = ["#ffffff","#dff8e6","#76d58b","#168336","#ffe66d"];
     for(var i=0;i<56;i++){
       var spark = document.createElement("span");
       spark.className = "spark";
-      spark.style.setProperty("--x", "50%");
-      spark.style.setProperty("--y", "48%");
-      spark.style.setProperty("--a", (i * 6.43) + "deg");
-      spark.style.setProperty("--d", (260 + (i % 7) * 42) + "px");
-      spark.style.setProperty("--spark", colors[i % colors.length]);
+      spark.style.setProperty("--x","50%");
+      spark.style.setProperty("--y","48%");
+      spark.style.setProperty("--a",(i*6.43)+"deg");
+      spark.style.setProperty("--d",(260+(i%7)*42)+"px");
+      spark.style.setProperty("--spark",colors[i%colors.length]);
       burst.appendChild(spark);
     }
-
     document.body.appendChild(burst);
     clearTimeout(finalRevealTimer);
-    finalRevealTimer = setTimeout(function(){
-      burst.remove();
-      done();
-    }, 620);
+    finalRevealTimer = setTimeout(function(){ burst.remove(); done(); }, 620);
   }
 
   function recompute(animate){
@@ -862,16 +738,12 @@
 
     boxes.forEach(function(b){
       var picked = winSel[b.id];
-      if(picked && displayText(b.id) === displayText(picked)){
-        wonSet[b.id] = true;
-      }
+      if(picked && displayText(b.id) === displayText(picked)) wonSet[b.id] = true;
     });
 
     matches.forEach(function(m){
       if(!winSel[m.pid]) return;
       m.kids.forEach(function(kid){
-        if((m.pid === "wL5" && kid === "wL4" && winSel.sL2 !== "wL5") ||
-           (m.pid === "wR5" && kid === "wR4" && winSel.sR2 !== "wR5")) return;
         if(kid !== winSel[m.pid]) lostSet[kid] = true;
       });
     });
@@ -883,23 +755,7 @@
       markLostPath(picked);
     }
 
-    boxes.forEach(function(b){
-      if(lostSet[b.id]) markLostPath(b.id);
-    });
-
-    if(winSel.sL2 === "wL3"){
-      lostSet.wL4 = true;
-      lostSet.wL5 = true;
-      markLostPath("wL4");
-      markLostPath("wL5");
-    }
-
-    if(winSel.sR2 === "wR3"){
-      lostSet.wR4 = true;
-      lostSet.wR5 = true;
-      markLostPath("wR4");
-      markLostPath("wR5");
-    }
+    boxes.forEach(function(b){ if(lostSet[b.id]) markLostPath(b.id); });
 
     var finalText = displayText("F");
     var shouldRevealFinal = animate && !!winSel.F && txtEl.F.textContent !== finalText;
@@ -911,7 +767,7 @@
       } else {
         if(editingId !== b.id) txtEl[b.id].textContent = displayText(b.id);
       }
-      boxEl[b.id].classList.toggle("won", !!wonSet[b.id]);
+      boxEl[b.id].classList.toggle("won",  !!wonSet[b.id]);
       boxEl[b.id].classList.toggle("lost", !!lostSet[b.id]);
     });
 
@@ -919,33 +775,23 @@
 
     if(shouldRevealFinal){
       txtEl.F.textContent = "";
-      fireworkFinal(function(){
-        txtEl.F.textContent = finalText;
-      });
+      fireworkFinal(function(){ txtEl.F.textContent = finalText; });
     }
 
     matches.forEach(function(m){
       if(m.linesByKid){
         m.kids.forEach(function(kid){
-          var lines = m.linesByKid[kid] || [];
-          lines.forEach(function(line){
-            var bridgeLost = (m.pid === "wL5" && kid === "wL4" && winSel.sL2 === "wL4") ||
-                             (m.pid === "wR5" && kid === "wR4" && winSel.sR2 === "wR4");
-            line.classList.toggle("lost-wire", !!lostSet[kid] || bridgeLost);
+          (m.linesByKid[kid]||[]).forEach(function(line){
+            line.classList.toggle("lost-wire", !!lostSet[kid]);
           });
         });
       }
-      if(m.parentLine){
-        m.parentLine.classList.toggle("lost-wire", !!lostSet[m.pid]);
-      }
+      if(m.parentLine) m.parentLine.classList.toggle("lost-wire", !!lostSet[m.pid]);
 
       if(winSel[m.pid]){
-        if(lostSet[m.pid]){
-          hideWinWire(m.green);
-        }else{
-          showWinWire(m.green, routeD(m, winSel[m.pid]), !!animate);
-        }
-      }else{
+        if(lostSet[m.pid]) hideWinWire(m.green);
+        else showWinWire(m.green, routeD(m, winSel[m.pid]), !!animate);
+      } else {
         hideWinWire(m.green);
       }
     });
@@ -961,41 +807,25 @@
 
   function viewportSize(){
     var vv = window.visualViewport;
-    if(vv){
-      return {
-        w:vv.width,
-        h:vv.height,
-        x:vv.offsetLeft || 0,
-        y:vv.offsetTop || 0
-      };
-    }
-    return {
-      w: window.innerWidth || document.documentElement.clientWidth,
-      h: window.innerHeight || document.documentElement.clientHeight,
-      x:0,
-      y:0
-    };
+    if(vv) return {w:vv.width, h:vv.height, x:vv.offsetLeft||0, y:vv.offsetTop||0};
+    return {w:window.innerWidth||document.documentElement.clientWidth, h:window.innerHeight||document.documentElement.clientHeight, x:0, y:0};
   }
 
   function fit(){
     var size = viewportSize();
-    var pad = Math.min(20, Math.floor(Math.min(size.w, size.h) * 0.02));
-    var scale = Math.min((size.w - pad*2) / W, (size.h - pad*2) / H);
-    stage.style.left = size.x + "px";
-    stage.style.top = size.y + "px";
-    stage.style.width = size.w + "px";
-    stage.style.height = size.h + "px";
-    canvas.style.transform = "translate(-50%, -50%) scale(" + Math.min(scale, 1.18) + ")";
+    var pad = Math.min(20, Math.floor(Math.min(size.w,size.h)*0.02));
+    var scale = Math.min((size.w-pad*2)/W, (size.h-pad*2)/H);
+    stage.style.left   = size.x+"px";
+    stage.style.top    = size.y+"px";
+    stage.style.width  = size.w+"px";
+    stage.style.height = size.h+"px";
+    canvas.style.transform = "translate(-50%,-50%) scale("+Math.min(scale,1.18)+")";
   }
 
-  window.addEventListener("resize",fit);
-  window.addEventListener("orientationchange",function(){
-    fit();
-    setTimeout(fit,250);
-  });
-  if(window.visualViewport){
-    window.visualViewport.addEventListener("resize",fit);
-  }
+  window.addEventListener("resize", fit);
+  window.addEventListener("orientationchange", function(){ fit(); setTimeout(fit,250); });
+  if(window.visualViewport) window.visualViewport.addEventListener("resize", fit);
+
   recompute(false);
   fit();
 })();
